@@ -1,4 +1,4 @@
-﻿using gestiondenomina.DAL;
+using gestiondenomina.DAL;
 using System;
 using System.Globalization;
 using System.Linq;
@@ -20,6 +20,7 @@ namespace gestiondenomina.UI
                 Console.WriteLine("3) Editar empleado");
                 Console.WriteLine("4) Eliminar empleado");
                 Console.WriteLine("5) Reporte mensual");
+                Console.WriteLine("6) Cálculo de nómina:");
                 Console.WriteLine("0) Salir");
                 Console.Write("Seleccione una opción: ");
                 var opt = Console.ReadLine();
@@ -40,6 +41,9 @@ namespace gestiondenomina.UI
                         break;
                     case "5":
                         ReporteMensual(repo);
+                        break;
+                    case "6":
+                        CalculoNomina(repo);
                         break;
                     case "0":
                         salir = true;
@@ -196,18 +200,104 @@ namespace gestiondenomina.UI
                 return;
             }
 
-            decimal totalPagadoPorEmpresa = 0m;
-            Console.WriteLine("Empleado | Bruto | AFP(2.87%) | ARS(3.04%) | Deducciones | Neto");
+            decimal totalBruto = 0m;
+            decimal totalAFP = 0m;
+            decimal totalARS = 0m;
+            decimal totalISR = 0m;
+            decimal totalDeducciones = 0m;
+            decimal totalNeto = 0m;
+
+            Console.WriteLine("\n=== REPORTE DE NÓMINA ===");
+            Console.WriteLine(string.Format("{0,-20} {1,12} {2,12} {3,12} {4,12} {5,12}", 
+                "Empleado", "Bruto", "AFP(2.87%)", "ARS(3.04%)", "ISR(2%)", "Neto"));
+            Console.WriteLine(new string('-', 92));
+
             foreach (var e in filtrados)
             {
-                var afp = e.SalarioBruto * 0.0287m;
-                var ars = e.SalarioBruto * 0.0304m;
-                var ded = afp + ars; // ISR no implementado
-                var neto = e.SalarioBruto - ded;
-                totalPagadoPorEmpresa += neto;
-                Console.WriteLine($"{e.Nombre} | {e.SalarioBruto:C} | {afp:C} | {ars:C} | {ded:C} | {neto:C}");
+                totalBruto += e.SalarioBruto;
+                totalAFP += e.AFP;
+                totalARS += e.ARS;
+                totalISR += e.ISR;
+                totalDeducciones += e.Deducciones;
+                totalNeto += e.SalarioNeto;
+
+                Console.WriteLine(string.Format("{0,-20} {1,12:C} {2,12:C} {3,12:C} {4,12:C} {5,12:C}",
+                    e.Nombre, e.SalarioBruto, e.AFP, e.ARS, e.ISR, e.SalarioNeto));
             }
-            Console.WriteLine($"\nTotal pagado por la empresa: {totalPagadoPorEmpresa:C}");
+            
+            Console.WriteLine(new string('-', 92));
+            Console.WriteLine(string.Format("{0,-20} {1,12:C} {2,12:C} {3,12:C} {4,12:C} {5,12:C}",
+                "TOTAL", totalBruto, totalAFP, totalARS, totalISR, totalNeto));
+            Console.WriteLine($"\nTotal deducciones: {totalDeducciones:C}");
+            Console.WriteLine($"Total a pagar (neto): {totalNeto:C}");
+        }
+
+        static void CalculoNomina(IEmpleadoRepository repo)
+        {
+            Console.WriteLine("-- Cálculo de Nómina (Exportar a CSV) --");
+            Console.Write("Año (YYYY): ");
+            if (!int.TryParse(Console.ReadLine(), out var year))
+            {
+                Console.WriteLine("Año inválido.");
+                return;
+            }
+            Console.Write("Mes (1-12): ");
+            if (!int.TryParse(Console.ReadLine(), out var month) || month < 1 || month > 12)
+            {
+                Console.WriteLine("Mes inválido.");
+                return;
+            }
+
+            Console.Write("Nombre del archivo (ej: reporte_2025_11): ");
+            var nombreArchivo = Console.ReadLine() ?? "reporte";
+
+            var todos = repo.GetAll();
+            var filtrados = todos.Where(e => e.FechaIngreso.Year <= year && e.FechaIngreso.Month <= month).ToList();
+
+            if (!filtrados.Any())
+            {
+                Console.WriteLine("No hay registros para el periodo indicado.");
+                return;
+            }
+
+            try
+            {
+                string rutaArchivo = $"{nombreArchivo}.csv";
+                using (var writer = new System.IO.StreamWriter(rutaArchivo, false, System.Text.Encoding.UTF8))
+                {
+                    // Encabezado
+                    writer.WriteLine("Empleado,Salario Bruto,AFP (2.87%),ARS (3.04%),ISR (2%),Deducciones,Salario Neto");
+
+                    decimal totalBruto = 0m;
+                    decimal totalAFP = 0m;
+                    decimal totalARS = 0m;
+                    decimal totalISR = 0m;
+                    decimal totalDeducciones = 0m;
+                    decimal totalNeto = 0m;
+
+                    // Datos
+                    foreach (var e in filtrados)
+                    {
+                        totalBruto += e.SalarioBruto;
+                        totalAFP += e.AFP;
+                        totalARS += e.ARS;
+                        totalISR += e.ISR;
+                        totalDeducciones += e.Deducciones;
+                        totalNeto += e.SalarioNeto;
+
+                        writer.WriteLine($"\"{e.Nombre}\",{e.SalarioBruto},{e.AFP},{e.ARS},{e.ISR},{e.Deducciones},{e.SalarioNeto}");
+                    }
+
+                    // Total
+                    writer.WriteLine($"TOTAL,{totalBruto},{totalAFP},{totalARS},{totalISR},{totalDeducciones},{totalNeto}");
+                }
+
+                Console.WriteLine($"✓ Reporte exportado exitosamente a: {rutaArchivo}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error al exportar: {ex.Message}");
+            }
         }
     }
 }
