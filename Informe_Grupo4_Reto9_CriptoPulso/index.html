@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Monitor en tiempo real de precios de criptomonedas con alertas personalizadas.">
+  <title>CriptoPulso | Monitor de precios</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="#inicio" aria-label="CriptoPulso, inicio">
+      <span class="brand-mark" aria-hidden="true">CP</span>
+      <span>CriptoPulso</span>
+    </a>
+    <nav aria-label="Navegación principal">
+      <a href="#mercado">Mercado</a>
+      <a href="#alertas">Alertas</a>
+      <button id="themeButton" class="icon-button" type="button" aria-label="Cambiar tema" title="Cambiar tema">☼</button>
+    </nav>
+  </header>
+
+  <main id="inicio">
+    <section class="hero" aria-labelledby="heroTitle">
+      <div>
+        <p class="eyebrow"><span class="live-dot"></span> Mercado en vivo</p>
+        <h1 id="heroTitle">El mercado cripto,<br><span>bajo tu radar.</span></h1>
+        <p class="hero-copy">Consulta las principales criptomonedas y recibe una alerta cuando el precio alcance tu objetivo.</p>
+      </div>
+      <div class="market-summary" aria-label="Estado de la consulta">
+        <span class="summary-label">CONEXIÓN</span>
+        <strong id="connectionText">Conectando…</strong>
+        <span id="lastUpdate">Esperando datos</span>
+        <button id="refreshButton" class="secondary-button" type="button">↻ Actualizar ahora</button>
+      </div>
+    </section>
+
+    <section id="mercado" class="section" aria-labelledby="marketTitle">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">Panel de mercado</p>
+          <h2 id="marketTitle">Precios principales</h2>
+        </div>
+        <label class="search-box">
+          <span class="sr-only">Buscar criptomoneda</span>
+          <span aria-hidden="true">⌕</span>
+          <input id="searchInput" type="search" placeholder="Buscar moneda…" autocomplete="off">
+        </label>
+      </div>
+
+      <div id="priceGrid" class="price-grid" aria-live="polite" aria-busy="true">
+        <p class="empty-state">Consultando precios…</p>
+      </div>
+      <p id="marketMessage" class="status-message" role="status"></p>
+    </section>
+
+    <section id="alertas" class="section alerts-section" aria-labelledby="alertsTitle">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">Vigilancia personal</p>
+          <h2 id="alertsTitle">Mis alertas</h2>
+        </div>
+        <span id="alertCount" class="count-pill">0 activas</span>
+      </div>
+
+      <div class="alerts-layout">
+        <form id="alertForm" class="alert-form">
+          <h3>Nueva alerta</h3>
+          <p>Te avisaremos una vez cuando se cumpla la condición.</p>
+
+          <label for="coinSelect">Criptomoneda</label>
+          <select id="coinSelect" required></select>
+
+          <div class="two-columns">
+            <div>
+              <label for="conditionSelect">Condición</label>
+              <select id="conditionSelect" required>
+                <option value="above">Sube hasta</option>
+                <option value="below">Baja hasta</option>
+              </select>
+            </div>
+            <div>
+              <label for="targetInput">Precio objetivo (USD)</label>
+              <input id="targetInput" type="number" min="0.000001" step="any" placeholder="Ej. 100000" required>
+            </div>
+          </div>
+
+          <button class="primary-button" type="submit">+ Crear alerta</button>
+          <button id="notificationButton" class="text-button" type="button">Activar notificaciones del navegador</button>
+          <p id="formMessage" class="form-message" role="status"></p>
+        </form>
+
+        <div>
+          <div id="alertList" class="alert-list" aria-live="polite"></div>
+          <div id="emptyAlerts" class="empty-alerts">
+            <span aria-hidden="true">◎</span>
+            <h3>Aún no tienes alertas</h3>
+            <p>Crea una para seguir el precio sin mirar la pantalla todo el tiempo.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="info-strip" aria-label="Información del servicio">
+      <div><strong>15 s</strong><span>Intervalo de actualización</span></div>
+      <div><strong>8</strong><span>Criptomonedas monitoreadas</span></div>
+      <div><strong>USD</strong><span>Moneda de referencia</span></div>
+      <div><strong>Local</strong><span>Alertas guardadas en tu equipo</span></div>
+    </section>
+  </main>
+
+  <footer>
+    <p>CriptoPulso · Reto 9 · Programación III</p>
+    <p>Datos de mercado provistos por Binance. Solo con fines educativos.</p>
+  </footer>
+
+  <div id="toastContainer" class="toast-container" aria-live="assertive"></div>
+  <script src="js/app.js"></script>
+</body>
+</html>
