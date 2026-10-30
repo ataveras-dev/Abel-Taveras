@@ -1,0 +1,23 @@
+HISTORIAL DE CREACION - TAINO VS. CARIBE
+
+1. Se preparo el proyecto Tres en Raya con una version inicial en React,
+   incluyendo el tablero, los turnos, la deteccion de ganador o empate y
+   el boton para reiniciar.
+
+2. Se agrego un diseno inspirado en los colores de la Republica Dominicana,
+   con los jugadores Taino y Caribe, y se implemento el guardado de la partida
+   en el almacenamiento local del navegador.
+
+3. Como Node.js y npm no estaban disponibles en el equipo, se adapto
+   index.html para que el juego pudiera abrirse directamente en el navegador,
+   sin instalar dependencias ni iniciar un servidor.
+
+4. Se abrio index.html en el navegador y se comprobo una partida completa:
+   Taino jugo en las casillas 1, 2 y 3; Caribe jugo en las casillas 4 y 5.
+   Se verifico el mensaje de victoria de Taino y que el boton Reiniciar
+   dejara el tablero vacio y devolviera el turno a Taino.
+
+5. Se documento en README.md como abrir y jugar, lo aprendido y la parte
+   mas dificil del proyecto.
+
+Fecha de registro: 30 de octubre de 2026

@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#f5f2ea" />
+    <meta
+      name="description"
+      content="Juega Tres en Raya con un toque dominicano: Taino vs. Caribe."
+    />
+    <title>Taino vs. Caribe | Tres en Raya</title>
+    <link rel="stylesheet" href="./src/styles.css" />
+  </head>
+  <body>
+    <main class="page-shell">
+      <header class="topbar">
+        <a class="brand" href="./" aria-label="Taino vs Caribe, inicio">
+          <span class="brand-mark" aria-hidden="true">
+            <span></span><span></span><span></span><span></span>
+          </span>
+          <span>JUEGOS DE QUISQUEYA</span>
+        </a>
+        <span class="edition">EDICIÓN DE PATIO <span aria-hidden="true">✳</span></span>
+      </header>
+
+      <section class="game-layout" aria-labelledby="game-title">
+        <div class="intro">
+          <p class="eyebrow"><span></span> UN CLÁSICO, A LO DOMINICANO</p>
+          <h1 id="game-title">Taino <span>vs.</span><br />Caribe</h1>
+          <p class="intro-copy">
+            Tres en raya, una sola misión: alinear tus símbolos antes que tu
+            contrincante.
+          </p>
+
+          <div class="players" aria-label="Jugadores">
+            <div class="player-card player-x" id="player-x">
+              <span class="player-symbol">X</span>
+              <span class="player-info"><strong>Taino</strong><small>JUGADOR 1</small></span>
+              <span class="turn-dot" aria-label="Su turno"></span>
+            </div>
+            <div class="player-card player-o" id="player-o">
+              <span class="player-symbol">O</span>
+              <span class="player-info"><strong>Caribe</strong><small>JUGADOR 2</small></span>
+              <span class="turn-dot" aria-label="Su turno" hidden></span>
+            </div>
+          </div>
+
+          <p class="how-to-play"><span aria-hidden="true">↗</span> ¡Toca un cuadro vacío para jugar!</p>
+        </div>
+
+        <div class="board-panel">
+          <div class="board-heading">
+            <div>
+              <p class="board-label">PARTIDA EN CURSO</p>
+              <p class="game-status" id="game-status" aria-live="polite">Turno de Taino</p>
+            </div>
+            <span class="round-number">01 <span>/ 01</span></span>
+          </div>
+
+          <div class="board" id="board" role="group" aria-label="Tablero de Tres en Raya"></div>
+          <button class="reset-button" id="reset-button" type="button">
+            <span aria-hidden="true">↻</span> Reiniciar partida
+          </button>
+        </div>
+      </section>
+
+      <footer class="footer">
+        <p>HECHO CON ORGULLO EN QUISQUEYA <span aria-hidden="true">♥</span></p>
+        <div class="flag" role="img" aria-label="Bandera de República Dominicana">
+          <span></span><span></span><span></span><span></span>
+        </div>
+      </footer>
+    </main>
+
+    <script>
+      const winningLines = [
+        [0, 1, 2], [3, 4, 5], [6, 7, 8],
+        [0, 3, 6], [1, 4, 7], [2, 5, 8],
+        [0, 4, 8], [2, 4, 6],
+      ];
+      const playerNames = { X: "Taino", O: "Caribe" };
+      const board = document.querySelector("#board");
+      const status = document.querySelector("#game-status");
+      const cells = [];
+      let squares = Array(9).fill(null);
+      let currentPlayer = "X";
+
+      try {
+        const savedGame = JSON.parse(localStorage.getItem("tres-en-raya"));
+        if (
+          savedGame &&
+          Array.isArray(savedGame.squares) &&
+          savedGame.squares.length === 9 &&
+          savedGame.squares.every((square) => square === null || square === "X" || square === "O") &&
+          (savedGame.currentPlayer === "X" || savedGame.currentPlayer === "O")
+        ) {
+          squares = savedGame.squares;
+          currentPlayer = savedGame.currentPlayer;
+        }
+      } catch (error) {
+        console.error("No se pudo recuperar la partida guardada.", error);
+      }
+
+      function getWinner() {
+        return winningLines.find(([a, b, c]) =>
+          squares[a] && squares[a] === squares[b] && squares[a] === squares[c]
+        );
+      }
+
+      function render() {
+        const winningLine = getWinner();
+        const draw = !winningLine && squares.every(Boolean);
+        const finished = Boolean(winningLine || draw);
+
+        squares.forEach((value, index) => {
+          const cell = cells[index];
+          cell.textContent = value || "";
+          cell.className = `square ${value ? `square-${value.toLowerCase()}` : ""} ${
+            winningLine?.includes(index) ? "is-winning" : ""
+          }`.trim();
+          cell.disabled = Boolean(value) || finished;
+          cell.setAttribute(
+            "aria-label",
+            `Cuadro ${index + 1}${value ? `, ${playerNames[value]}` : ", vacío"}`,
+          );
+        });
+
+        status.textContent = winningLine
+          ? `¡${playerNames[squares[winningLine[0]]]} gana la partida!`
+          : draw
+            ? "¡Empate! La próxima se decide en el patio."
+            : `Turno de ${playerNames[currentPlayer]}`;
+
+        ["X", "O"].forEach((player) => {
+          const card = document.querySelector(`#player-${player.toLowerCase()}`);
+          const active = player === currentPlayer && !finished;
+          card.classList.toggle("is-active", active);
+          card.querySelector(".turn-dot").hidden = !active;
+        });
+
+        try {
+          localStorage.setItem("tres-en-raya", JSON.stringify({ squares, currentPlayer }));
+        } catch (error) {
+          console.error("No se pudo guardar la partida.", error);
+        }
+      }
+
+      squares.forEach((_, index) => {
+        const cell = document.createElement("button");
+        cell.className = "square";
+        cell.type = "button";
+        cell.addEventListener("click", () => {
+          if (squares[index] || getWinner() || squares.every(Boolean)) return;
+          squares[index] = currentPlayer;
+          currentPlayer = currentPlayer === "X" ? "O" : "X";
+          render();
+        });
+        cells.push(cell);
+        board.append(cell);
+      });
+
+      document.querySelector("#reset-button").addEventListener("click", () => {
+        squares = Array(9).fill(null);
+        currentPlayer = "X";
+        render();
+      });
+
+      render();
+    </script>
+  </body>
+</html>
