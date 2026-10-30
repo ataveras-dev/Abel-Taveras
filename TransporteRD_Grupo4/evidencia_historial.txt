@@ -1,0 +1,90 @@
+EVIDENCIA E HISTORIAL DEL PROYECTO
+TransporteRD: Calcula tu pasaje — Reto 4 — Lenguaje de Programación III (INF5160-18), UASD
+Grupo 4 — Prof. Edian Franklin Franco De los Santos
+Integrantes: Benson Ho Chen, Abel Taveras, Joanfi Espinal López,
+  Yadeiry Nicole Brito Reynoso y José Peña
+App en línea: (pendiente, la publica otro integrante del grupo)
+======================================================================
+
+1. PASOS DEL DESARROLLO
+-----------------------
+1) Investigamos los precios reales de octubre 2026:
+   - Gasoil regular: RD$270.80 por galón (MICM, semana 24-30 de octubre).
+   - Metro y Teleférico de Santo Domingo: RD$20; tarifa integrada: RD$35.
+   - Precio conocido para calibrar: Santiago -> Santo Domingo en guagua = RD$450.
+2) Creamos el proyecto con React + Vite y lo pusimos en Git.
+3) Cargamos 28 ciudades con su latitud y longitud (src/data/ciudades.js).
+4) Programamos los cálculos: distancia (Haversine x 1.22), pasaje
+   (base + precio por km) y ajuste por el precio del gasoil (src/logic/calculos.js).
+5) Hicimos la pestaña "Entre ciudades": origen, destino, botón para intercambiar,
+   pasajeros, ida y vuelta, y tarjetas con precio y tiempo de cada transporte.
+6) Hicimos la pestaña "En la ciudad": gasto por viaje, día, semana y mes,
+   con gráfica de barras para comparar transportes.
+7) Agregamos la barra "¿y si sube el gasoil?" que recalcula todos los pasajes.
+8) Agregamos el historial de rutas y guardamos las preferencias con localStorage
+   usando un hook propio (usePersistente).
+9) Agregamos modo oscuro, animaciones CSS y diseño para celular.
+10) Probamos todo en el navegador y tomamos las capturas.
+11) Dejamos listo GitHub Actions (.github/workflows/deploy.yml) para publicarlo
+    en GitHub Pages; la publicación la hace otro integrante del grupo.
+
+2. PRUEBAS REALIZADAS
+---------------------
+[OK] Santiago -> Santo Domingo: guagua expreso RD$450 (2 h 36 min),
+     guagua de ruta RD$370 (3 h 42 min), carro público no disponible (164 km).
+[OK] Santo Domingo -> Baní (59 km): expreso RD$190, ruta RD$150, carro público RD$240.
+[OK] Santo Domingo -> Punta Cana: expreso RD$540, ruta RD$450.
+[OK] 2 pasajeros ida y vuelta a Punta Cana: RD$2,160 en expreso (RD$540 c/u).
+[OK] Gasoil a RD$350: aviso "Los pasajes subirían 12%" y expreso a Punta Cana pasa a RD$610.
+[OK] Botón "Volver a RD$270.80" regresa al precio de esta semana.
+[OK] Botón intercambiar: "Santo Domingo -> Punta Cana" pasa a "Punta Cana -> Santo Domingo".
+[OK] Misma ciudad de salida y llegada: muestra aviso para usar "En la ciudad".
+[OK] Historial guarda las últimas rutas sin repetir y al hacer clic las vuelve a cargar.
+[OK] En la ciudad (Santo Domingo, concho, 2 viajes x 5 días):
+     RD$60 por viaje, RD$120 al día, RD$600 a la semana, RD$2,598 al mes.
+[OK] Metro: RD$20 por viaje, RD$866 al mes, y no sube aunque suba el gasoil.
+[OK] Santiago no muestra Metro; si estaba elegido cambia solo a guagua urbana.
+[OK] Modo oscuro y modo claro; se recuerda al recargar la página.
+[OK] En celular (375 px de ancho) no hay desborde horizontal.
+[OK] El enlace .../#ciudad abre directo la pestaña "En la ciudad".
+[OK] npm run build compila sin errores.
+[OK] abrir.html (un solo archivo) abre con doble clic.
+
+3. HISTORIAL DE GIT (git log)
+-----------------------------
+dfda82d  2026-10-29 15:56  Jose Luis Peña  Quitar enlaces de publicación: la publica otro integrante
+62f2ce7  2026-10-29 15:43  Jose Luis Peña  Actualizar historial en la evidencia
+f65acf7  2026-10-29 15:43  Jose Luis Peña  Agregar Grupo 4 e integrantes
+4bfd11f  2026-10-29 15:41  Jose Luis Peña  Agregar historial de git a la evidencia
+8ae2e4f  2026-10-29 15:41  Jose Luis Peña  Evidencia del proyecto
+0f0218a  2026-10-29 15:39  Jose Luis Peña  TransporteRD: calculadora de pasajes entre ciudades y en la ciudad, modo oscuro, historial y publicación en GitHub Pages
+
+Archivos del proyecto:
+  .github/workflows/deploy.yml
+  .gitignore
+  README.md
+  abrir.html
+  capturas/en_la_ciudad.png
+  capturas/entre_ciudades.png
+  capturas/modo_oscuro.png
+  crear-abrir-html.js
+  evidencia_historial.txt
+  index.html
+  package-lock.json
+  package.json
+  public/favicon.svg
+  src/App.jsx
+  src/components/CalculadoraInterurbana.jsx
+  src/components/CalculadoraUrbana.jsx
+  src/components/Encabezado.jsx
+  src/components/Historial.jsx
+  src/components/PanelCombustible.jsx
+  src/components/TarjetaTransporte.jsx
+  src/data/ciudades.js
+  src/data/tarifas.js
+  src/index.css
+  src/logic/calculos.js
+  src/logic/storage.js
+  src/logic/usePersistente.js
+  src/main.jsx
+  vite.config.js
